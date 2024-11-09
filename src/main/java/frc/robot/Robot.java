@@ -8,7 +8,11 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.Robot_Functions;
-import edu.wpi.first.wpilibj.XboxController;;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Robot extends TimedRobot {
 
@@ -18,6 +22,8 @@ public class Robot extends TimedRobot {
     private final double kDriveTick2Feet = 1.0 / 128 * 6 * Math.PI / 12;
     private XboxController joystick;
     private Timer timer;
+
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
     public interface PS4 {
         int BLUE_X = 1;
@@ -100,6 +106,15 @@ public class Robot extends TimedRobot {
         double moveSeconds = 0.4;
         double turnSeconds = 0.1;
 
+        NetworkTableEntry tx = table.getEntry("tx");
+        NetworkTableEntry ty = table.getEntry("ty");
+        NetworkTableEntry ta = table.getEntry("ta");
+            
+        //read values periodically
+        double x = tx.getDouble(0.0);
+        double y = ty.getDouble(0.0);
+        double area = ta.getDouble(0.0);
+
         double rightTrigger = joystick.getRightTriggerAxis();
         double leftTrigger = joystick.getLeftTriggerAxis();
 
@@ -107,6 +122,11 @@ public class Robot extends TimedRobot {
         double rotation = -joystick.getLeftX()*0.5;
 
         driveTrain.arcadeDrive(forward, rotation);
+
+        //post to smart dashboard periodically
+        SmartDashboard.putNumber("LimelightX", x);
+        SmartDashboard.putNumber("LimelightY", y);
+        SmartDashboard.putNumber("LimelightArea", area);
 
         // Check for specific button inputs to trigger robot functions
         if (joystick.getRawButtonPressed(XBOX.YELLOW_Y)) {
