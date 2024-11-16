@@ -25,39 +25,26 @@ public class Robot extends TimedRobot {
 
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
-    public interface PS4 {
-        int BLUE_X = 1;
-        int RED_CIRCLE = 2;
-        int PINK_SQUARE = 3;
-        int GREEN_TRIANGLE = 4;
-        int LEFT_BUMPER = 5;
-        int RIGHT_BUMPER = 6;
-        int SHARE_BUTTON = 7;
-        int OPTIONS_BUTTON = 8;
-        int LEFT_JOYSTICK_PRESS = 9;
-        int RIGHT_JOYSTICK_PRESS = 10;
-        
-        int LEFT_JOYSTICK_HORIZONTAL = 0;
-        int LEFT_JOYSTICK_VERTICAL = 1;
-        int LEFT_TRIGGER_LOWER = 2;
-        int RIGHT_TRIGGER_LOWER = 3;
-        int RIGHT_JOYSTICK_HORIZONTAL = 4;
-        int RIGHT_JOYSTICK_VERTICAL = 5;
-    }
-
-    public interface XBOX {
-        int GREEN_A = 1;
-        int RED_B = 2;
-        int BLUE_X = 3;
-        int YELLOW_Y = 4;
-
-        int LEFT_BUMPER = 5;
-        int RIGHT_BUMPER = 6;
-        int SCRRENSHOT_BUTTON = 7;
-        int MENU_BUTTON = 8;
-
-        int L3 = 9;
-        int R3 = 10;
+    public void followAprilTag() {
+        double kP_turn = 0.035; // Tuning parameter for turning control
+        double kP_drive = 0.1; // Tuning parameter for forward/backward drive control
+    
+        // Retrieve target offset angles from the Limelight
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        double tx = table.getEntry("tx").getDouble(0.0); // Horizontal offset from crosshair to target (-27 to 27 degrees)
+        double ty = table.getEntry("ty").getDouble(0.0); // Vertical offset from crosshair to target
+        double ta = table.getEntry("ta").getDouble(0.0); // Target area (not used but available)
+        double tagID = table.getEntry("tid").getDouble(-1); // Retrieved tag ID, if needed
+    
+        // Calculate turning speed using a proportional control loop
+        double turnSpeed = kP_turn * tx;
+    
+        // Calculate forward speed using ty for simple distance control
+        double driveSpeed = kP_drive * ty;
+    
+        // Adjust driveSpeed and turnSpeed as per desired behavior
+        // Drive towards the target using arcade drive control
+        driveTrain.arcadeDrive(-driveSpeed, turnSpeed); // Negative sign on driveSpeed if you need to invert direction
     }
 
     // Robot initialization
@@ -83,16 +70,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        // Autonomous actions based on joystick input
-        if (joystick.getRawButton(XBOX.RIGHT_BUMPER)) {
-            SmartDashboard.putString("Autonomous Status", "Moving 10 feet");
-            driveTrain.tankDrive(0.5, 0.5); // Move forward at 50% speed
-        } else if (joystick.getRawButton(XBOX.LEFT_BUMPER)) {
-            SmartDashboard.putString("Autonomous Status", "Moving back to 0");
-            driveTrain.tankDrive(-0.5, -0.5); // Move backward at 50% speed
-        } else {
-            driveTrain.stop();
-        }
     }
 
     @Override
@@ -131,25 +108,15 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("LimelightArea", area);
         SmartDashboard.putNumber("CurrentID", tagID);
 
-        // Check for specific button inputs to trigger robot functions
-        if (joystick.getRawButtonPressed(XBOX.YELLOW_Y)) {
-            robotFunctions.moveForward(moveSeconds);
-        }
-        if (joystick.getRawButtonPressed(XBOX.GREEN_A)) {
-            robotFunctions.moveBackward(moveSeconds);
-        }
-        if (joystick.getRawButtonPressed(XBOX.RED_B)) {
-            robotFunctions.turnRight(turnSeconds);
-        }
-        if (joystick.getRawButtonPressed(XBOX.BLUE_X)) {
-            robotFunctions.turnLeft(turnSeconds);
+        if (joystick.getAButton()) {
+            followAprilTag();
         }
 
         // Generic button press detection
-        for (int buttonID = 1; buttonID <= 10; buttonID++) {
-            if (joystick.getRawButton(buttonID)) {
-                System.out.println("Button pressed: " + buttonID);
-            }
-        }
+        //for (int buttonID = 1; buttonID <= 10; buttonID++) {
+        //    if (joystick.getRawButton(buttonID)) {
+        //        System.out.println("Button pressed: " + buttonID);
+        //    }
+        //}
     }
 }

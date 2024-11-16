@@ -13,6 +13,9 @@ public class DriveTrain extends SubsystemBase {
 
     private final DifferentialDrive differentialDrive;
 
+    public static final double kMaxAngularSpeed = Math.PI;
+    public static final double kMaxSpeed = 3.0;
+
     public DriveTrain() {
         // Initialize motors with the new CAN IDs
         rightFrontMotor = new WPI_TalonSRX(1); // Right Forward
