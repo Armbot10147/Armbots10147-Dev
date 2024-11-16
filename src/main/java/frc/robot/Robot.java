@@ -94,8 +94,8 @@ public class Robot extends TimedRobot {
         double area = ta.getDouble(0.0);
         double tagID = tid.getDouble(0);
 
-        double rightTrigger = joystick.getRightTriggerAxis();
-        double leftTrigger = joystick.getLeftTriggerAxis();
+        double rightTrigger = joystick.getRightTriggerAxis()*0.7;
+        double leftTrigger = joystick.getLeftTriggerAxis()*0.7;
 
         double forward = rightTrigger-leftTrigger;
         double rotation = -joystick.getLeftX()*0.5;
