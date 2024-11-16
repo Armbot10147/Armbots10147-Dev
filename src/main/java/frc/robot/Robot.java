@@ -109,11 +109,13 @@ public class Robot extends TimedRobot {
         NetworkTableEntry tx = table.getEntry("tx");
         NetworkTableEntry ty = table.getEntry("ty");
         NetworkTableEntry ta = table.getEntry("ta");
+        NetworkTableEntry tid = table.getEntry("tid");
             
         //read values periodically
         double x = tx.getDouble(0.0);
         double y = ty.getDouble(0.0);
         double area = ta.getDouble(0.0);
+        double tagID = tid.getDouble(0);
 
         double rightTrigger = joystick.getRightTriggerAxis()*0.7;
         double leftTrigger = joystick.getLeftTriggerAxis()*0.7;
@@ -127,6 +129,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("LimelightX", x);
         SmartDashboard.putNumber("LimelightY", y);
         SmartDashboard.putNumber("LimelightArea", area);
+        SmartDashboard.putNumber("CurrentID", tagID);
 
         // Check for specific button inputs to trigger robot functions
         if (joystick.getRawButtonPressed(XBOX.YELLOW_Y)) {
