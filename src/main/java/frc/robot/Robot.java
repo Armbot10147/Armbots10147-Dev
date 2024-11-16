@@ -10,6 +10,7 @@ import frc.robot.subsystems.DriveTrain;
 import frc.robot.Robot_Functions;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -22,11 +23,13 @@ public class Robot extends TimedRobot {
     private final double kDriveTick2Feet = 1.0 / 128 * 6 * Math.PI / 12;
     private XboxController joystick;
     private Timer timer;
+    //private SlewRateLimiter linear_limiter = new SlewRateLimiter(1);
+    //private SlewRateLimiter angular_limiter = new SlewRateLimiter(0.8);
 
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
     public void followAprilTag() {
-        double kP_turn = 0.035; // Tuning parameter for turning control
+        double kP_turn = 0.032; // Tuning parameter for turning control
         double kP_drive = 0.1; // Tuning parameter for forward/backward drive control
     
         // Retrieve target offset angles from the Limelight
@@ -35,16 +38,20 @@ public class Robot extends TimedRobot {
         double ty = table.getEntry("ty").getDouble(0.0); // Vertical offset from crosshair to target
         double ta = table.getEntry("ta").getDouble(0.0); // Target area (not used but available)
         double tagID = table.getEntry("tid").getDouble(-1); // Retrieved tag ID, if needed
-    
+
         // Calculate turning speed using a proportional control loop
-        double turnSpeed = kP_turn * tx;
+        double AngularVelocity = kP_turn * tx;
+        //AngularVelocity *= driveTrain.kMaxAngularSpeed;
+        AngularVelocity *=-1.0;
     
         // Calculate forward speed using ty for simple distance control
-        double driveSpeed = kP_drive * ty;
+        double forwardSpeed = kP_drive * ty;
+        forwardSpeed *= driveTrain.kMaxSpeed;
+        forwardSpeed *= -1;
     
         // Adjust driveSpeed and turnSpeed as per desired behavior
         // Drive towards the target using arcade drive control
-        driveTrain.arcadeDrive(-driveSpeed, turnSpeed); // Negative sign on driveSpeed if you need to invert direction
+        driveTrain.arcadeDrive(0, AngularVelocity); // Negative sign on driveSpeed if you need to invert direction
     }
 
     // Robot initialization
