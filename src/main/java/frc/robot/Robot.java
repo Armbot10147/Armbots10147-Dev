@@ -54,42 +54,6 @@ public class Robot extends TimedRobot {
         driveTrain.arcadeDrive(0, AngularVelocity); // Negative sign on driveSpeed if you need to invert direction
     }
 
-    public void findAprilTag() {
-        double kP_turn = 0.032; // Proportional control constant for turning
-    
-        // Retrieve target offset angles from the Limelight
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        double tx = table.getEntry("tx").getDouble(0.0); // Horizontal offset from crosshair to target (-27 to 27 degrees)
-    
-        while (joystick.getBButton()) { // Check if the button (e.g., B button) is being held
-            tx = table.getEntry("tx").getDouble(0.0); // Continuously fetch the tx value
-    
-            // Calculate turning speed using proportional control
-            double turnSpeed = kP_turn * tx;
-            
-            // Clamp the turn speed to prevent excessive rotation
-            turnSpeed = Math.max(-1.0, Math.min(1.0, turnSpeed));
-    
-            // Turn the robot to align with the tag
-            driveTrain.arcadeDrive(0, -turnSpeed); // Negative to correct the rotation direction
-    
-            // Break the loop if the robot is aligned within a small tolerance
-            if (Math.abs(tx) < 1.0) { // Tolerance of 1 degree
-                break;
-            }
-    
-            // Add a small delay to prevent CPU overloading
-            try {
-                Thread.sleep(20); // 20 ms delay
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    
-        // Stop the robot after alignment
-        driveTrain.arcadeDrive(0, 0);
-    }
-
     // Robot initialization
     @Override
     public void robotInit() {
@@ -153,10 +117,6 @@ public class Robot extends TimedRobot {
 
         if (joystick.getAButton()) {
             followAprilTag();
-        }
-
-        if(joystick.getBButton()){
-            findAprilTag();
         }
 
         // Generic button press detection
