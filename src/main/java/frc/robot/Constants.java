@@ -27,6 +27,8 @@ public final class Constants {
     public static final double limelightMountAngleDegrees = 0;
     public static final double limelightCameraHeightInches = 20;
     public static final double targetHeightInches = 60;
+    public static final double angular_kP = 0.032;
+    public static final double linear_kP = 0.1;
   }
 
   public static class DrivetrainConstants {

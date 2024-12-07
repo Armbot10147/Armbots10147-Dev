@@ -1,72 +1,62 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.LimeLightVision;
-import edu.wpi.first.wpilibj2.command.Command;
 
-public class FindTarget extends Command {
+public class FindTarget extends Command 
+{
+  private DriveTrain drivetrain_;
+  private LimeLightVision vision_;
+  private Boolean visionTargetFound_;
 
-    private final DriveTrain driveTrain_;
-    private final LimeLightVision limelight_;
-    private boolean visionTargetFound_;
+  /** Creates a new FindTarget. */
+  public FindTarget( DriveTrain drivetrain, 
+                           LimeLightVision vision )
+  {
+    drivetrain_ = drivetrain;
+    vision_ = vision;
 
-    public FindTarget(DriveTrain driveTrain, LimeLightVision limelight) {
-        driveTrain_ = driveTrain;
-        limelight_ = limelight;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(vision_, drivetrain_);    
+  }
 
-        addRequirements(driveTrain_, limelight_);
-    }
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() 
+  {
+    visionTargetFound_ = false;
+  }
 
-    @Override
-    public void initialize() {
-        visionTargetFound_ = false;
-    }
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() 
+  {
+    // Rotate robot slowly CCW
+    drivetrain_.arcadeDrive(0, 0.1);
 
-    @Override
-    public void execute() {
-        findAprilTag();
-    }
+    // Check if we see an Apriltag.
+    visionTargetFound_ = vision_.isValidVisionTarget();
+  }
 
-    @Override
-    public void end(boolean interrupted) {
-        driveTrain_.arcadeDrive(0, 0); // Stop the robot
-    }
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) 
+  {
+    drivetrain_.arcadeDrive(0, 0);
+  }
 
-    @Override
-    public boolean isFinished() {
-        return visionTargetFound_;
-    }
-
-    private void findAprilTag() {
-        double kP_turn = 0.032; // Proportional control constant for turning
-
-        while (limelight_.isValidVisionTarget()) { // Check if a valid target is detected
-            double tx = limelight_.getTX(); // Get horizontal offset from Limelight
-
-            // Calculate turning speed using proportional control
-            double turnSpeed = kP_turn * tx;
-
-            // Clamp the turn speed to prevent excessive rotation
-            turnSpeed = Math.max(-1.0, Math.min(1.0, turnSpeed));
-
-            // Turn the robot to align with the target
-            driveTrain_.arcadeDrive(0, -turnSpeed); // Negative to correct the rotation direction
-
-            // Check if aligned within a small tolerance
-            if (Math.abs(tx) < 1.0) { // Tolerance of 1 degree
-                visionTargetFound_ = true;
-                break;
-            }
-
-            // Add a small delay to avoid CPU overloading
-            try {
-                Thread.sleep(20); // 20 ms delay
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // Stop the robot after alignment
-        driveTrain_.arcadeDrive(0, 0);
-    }
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() 
+  {
+    if ( visionTargetFound_ == true )
+      return true;
+    else
+      return false;
+  }
 }
