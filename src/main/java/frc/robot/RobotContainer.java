@@ -10,6 +10,7 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.FindTarget;
 import frc.robot.commands.GoToTarget;
 import frc.robot.subsystems.ExampleSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -61,9 +62,9 @@ public class RobotContainer {
       .a()
         .whileTrue(
           new FindTarget(driveTrain_, limelight_)
-          .withTimeout(30)
+          //.withTimeout(30)
           .andThen(new GoToTarget(driveTrain_, 12, limelight_))
-          .withTimeout(30)
+          //.withTimeout(30)
           .handleInterrupt(() -> driveTrain_.stop()));
 
   }

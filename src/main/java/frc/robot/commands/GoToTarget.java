@@ -36,6 +36,7 @@ public class GoToTarget extends Command
   @Override
   public void initialize() 
   {
+    System.out.println("Running GoToTarget Command");
     //table = NetworkTableInstance.getDefault().getTable("limelight");
     // Reset encoders to 0.
     //drivetrain_.resetEncoders();
@@ -81,7 +82,8 @@ public class GoToTarget extends Command
   @Override
   public void end(boolean interrupted) 
   {
-        drivetrain_.arcadeDrive(0, 0);
+    System.out.println("Ending GoToTarget Command");
+    drivetrain_.arcadeDrive(0, 0);
   }
 
   // Returns true when the command should end.

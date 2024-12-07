@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.LimeLightVision;
@@ -29,6 +30,7 @@ public class FindTarget extends Command
   @Override
   public void initialize() 
   {
+    System.out.println("Running FindTarget Command");
     visionTargetFound_ = false;
   }
 
@@ -37,7 +39,7 @@ public class FindTarget extends Command
   public void execute() 
   {
     // Rotate robot slowly CCW
-    drivetrain_.arcadeDrive(0, 0.1);
+    drivetrain_.arcadeDrive(0, 0.5);
 
     // Check if we see an Apriltag.
     visionTargetFound_ = vision_.isValidVisionTarget();
@@ -47,6 +49,7 @@ public class FindTarget extends Command
   @Override
   public void end(boolean interrupted) 
   {
+    System.out.println("Ending FindTarget Command");
     drivetrain_.arcadeDrive(0, 0);
   }
 
